@@ -1,0 +1,966 @@
+<?php
+include('connectdb.php');
+session_start();
+
+$user_id = $_SESSION['user_id'] ?? null;
+$favorit_videos = [];
+
+if ($user_id) {
+    $query = "SELECT * FROM progress WHERE user_id = $user_id ORDER BY created_at DESC";
+    $result = mysqli_query($db, $query);
+    while ($row = mysqli_fetch_assoc($result)) {
+        $favorit_videos[] = $row;
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gudang Skill</title>
+  <!-- style -->
+  <style>
+    :root {
+    --primary: #003366;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    border: none;
+    scroll-behavior: smooth;
+}
+
+button,
+input,
+textarea,
+select {
+    font-family: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    outline: none;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    color: white;
+    background: linear-gradient(to bottom, #003366, rgb(20, 19, 19))
+}
+
+body::-webkit-scrollbar {
+    display: none;
+}
+
+/* ========================================================================================================== */
+/* ------------------HEADER------------------------- */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 10dvh;
+    width: 100%;
+    padding: 0 50px;
+    background-color: var(--primary);
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.7);
+    position: relative;
+}
+
+
+a {
+    color: white;
+    text-decoration: none;
+}
+
+nav {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 50%;
+    font-size: 1.5rem;
+    font-weight: 300;
+}
+
+nav a:hover {
+    color: black;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    width: 25%;
+
+}
+
+.logo-container a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-container img {
+    width: 80px;
+    height: auto;
+}
+
+.logo-container h1 {
+    font-size: 2.2rem;
+    -webkit-text-stroke: 1.4px #000000;
+}
+
+
+.logo-container span {
+    color: #80c0ff;
+}
+
+.btn-login {
+    padding: 12px 24px;
+    position: relative;
+    overflow: hidden;
+    background-color: transparent;
+    text-align: center;
+    border-radius: 8px;
+    transition: .3s;
+    z-index: 1;
+}
+
+.btn-login::before {
+    content: '';
+    width: 0;
+    height: 300%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+    background: white;
+    transition: .5s ease;
+    display: block;
+    z-index: -1;
+}
+
+.btn-login:hover::before {
+    width: 105%;
+}
+
+.btn-login:hover {
+    color: #0080ff;
+    font-weight: bold;
+}
+
+.btn-regis {
+    padding: 12px 24px;
+    position: relative;
+    overflow: hidden;
+    background-color: transparent;
+    text-align: center;
+    border-radius: 8px;
+    transition: .3s;
+    z-index: 1;
+}
+
+.btn-regis::before {
+    content: '';
+    width: 0;
+    height: 300%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(135deg);
+    background: white;
+    transition: .5s ease;
+    display: block;
+    z-index: -1;
+}
+
+.btn-regis:hover::before {
+    width: 105%;
+}
+
+.btn-regis:hover {
+    color: #0080ff;
+    font-weight: bold;
+}
+
+.garis-vertical {
+    width: 3px;
+    height: 3rem;
+    background-color: black;
+}
+
+.login-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 25px;
+    font-size: 1.5rem;
+    width: 25%;
+
+}
+
+/* ------------------HEADER------------------------- */
+/* ------------------BERANDA------------------------- */
+.bg-gambar {
+    opacity: 0.25;
+    width: 100%;
+    background-size: cover;
+}
+
+.beranda {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    min-height: 90dvh;
+    background-blend-mode: soft-light;
+    background: linear-gradient(to bottom, #003366, black), url("assets/backgorund_beranda.jpg");
+    background-size: cover;
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
+    /* Tambahkan bayangan */
+}
+
+.teks-beranda {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 3rem;
+    font-weight: 700;
+    width: 100%;
+    padding: 8rem 0;
+}
+
+.teks-beranda h1 {
+    width: 23ch;
+    animation: typing 2.5s steps(1000), blink .2s step-end 13 alternate-reverse;
+    white-space: nowrap;
+    overflow: hidden;
+    border-color: transparent;
+}
+
+
+@keyframes typing {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 23ch;
+    }
+}
+
+@keyframes blink {
+    50% {
+        border-right: 2px solid black;
+
+    }
+}
+
+.btn-jelajahi {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    color: white;
+    font-size: 1.5rem;
+    width: 16rem;
+    /* Atur lebar tombol */
+    height: 4rem;
+    max-width: 300px;
+    /* Batasi lebar maksimal */
+    border-radius: 11px;
+    cursor: pointer;
+    margin: 20px auto;
+    /* Pusatkan tombol */
+    background-color: rgba(0, 51, 102, 0.5);
+    transition: background .3s;
+}
+
+.btn-jelajahi:hover {
+    background-color: rgba(9, 116, 223, 0.7);
+    transition: ease-out .3s;
+}
+
+/* ------------------BERANDA------------------------- */
+/* --------------------------------------------SECTION SKILL-HOME------------------------------------------------- */
+.skill-home {
+    min-height: 100dvh;
+}
+
+.teks-kategori {
+    display: flex;
+    text-align: center;
+    justify-content: flex-start;
+    font-size: 5rem;
+    font-weight: 600;
+    width: max-content;
+    margin-top: 5dvh;
+    margin-left: 5vw;
+    flex-wrap: wrap;
+}
+
+.scroll-1::-webkit-scrollbar {
+    width: 2px;
+    height: 8px;
+}
+
+.scroll-1::-webkit-scrollbar-thumb {
+    border-radius: 20px;
+    background: #000000;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    overflow-x: scroll;
+    margin-top: 10px;
+    padding: 24px;
+    width: 100%;
+    height: 70dvh;
+    scroll-snap-type: x mandatory;
+    scroll-padding-top: 24px;
+    border-radius: 8px;
+    gap: 50px;
+}
+
+.card {
+    flex: 0 0 20%;
+    overflow: hidden;
+    border-radius: 8px;
+    scroll-snap-align: start;
+    box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.7);
+    position: relative;
+}
+
+.card a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    /* Agar <a> mencakup seluruh kartu */
+    top: 0;
+    left: 0;
+    z-index: 2;
+}
+
+.card__content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    border-radius: 8px;
+    position: relative;
+
+}
+
+.card__content a {
+    display: block;
+    /* Agar seluruh area gambar bisa diklik */
+}
+
+.card__content img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.card:hover img {
+    opacity: 0.7;
+    background-color: royalblue;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* --------------------------------------------SECTION SKILL-HOME------------------------------------------------- */
+
+/* --------------------------------------------SECTION FAVORIT------------------------------------------------- */
+.favorit {
+    min-height: 100dvh;
+}
+
+.teks-favorit {
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    font-size: 5rem;
+    font-weight: 600;
+    width: max-content;
+    margin: 5dvh 5vw 0 auto;
+}
+
+.content {
+  display: flex; 
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 2rem;
+}
+
+.favorit-content {
+  flex-grow: 1;
+  flex-basis: 100;
+}
+
+.favorit-content img {
+  height: 40dvh;
+  width: 50dvh;
+  margin-bottom: 0.5rem;
+  margin-left: 5px;
+  border-radius: 10px;
+  box-shadow: 2px 2px 115px rgba(0, 0, 0, 0.7);
+}
+
+
+/* --------------------------------------------SECTION FAVORIT END------------------------------------------------- */
+
+
+/* --------------------------------------------FOOTER---------------------------------------------------------------- */
+footer {
+    display: flex;
+    height: 30dvh;
+    margin-top: 10dvh;
+    background-color: #222;
+    color: white;
+    text-align: center;
+}
+.logo-container-footer {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    width: 50dvw;
+}
+.logo-container-footer a {
+    display: flex;
+    align-items: center;
+    margin: 3.1rem 0 0 5rem;
+    gap: 10px;
+}
+
+.logo-container-footer img {
+    width:100px ;
+    height: auto;
+}
+
+.logo-container-footer h1 {
+    font-size: 2.2rem;
+    -webkit-text-stroke: 1.4px #000000;
+}
+
+.teks-skill {
+    color: #80c0ff;
+}
+
+.logo-container-footer p {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin: 1rem 0 0 5rem;
+    font-size: 1.4rem;
+}
+
+.logo-copy {
+    justify-content: center;
+    font-size: 2rem;
+    margin:0 0.5rem;
+}
+
+.logo-medsos {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 5rem;
+    height: 7dvh;
+    margin: 0.2rem 0 0 5rem;    
+}
+
+.logo-medsos a{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+}
+
+.logo-medsos svg {
+    cursor: pointer;
+    width: 2.2rem;
+    height: 2.2rem;
+}
+
+.deskripsi {
+    display: flex;
+    justify-content: space-evenly;
+    width: 50dvw;
+}
+.about {
+    margin-top: 3.1rem;
+}
+
+.teks-about {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.about a {
+    display: flex;
+    justify-content: flex-start;
+    font-size: 1.4rem;
+    font-weight: 100;
+    align-items: center;
+    margin-top: 0.2rem;
+}
+
+.contact {
+    margin-top: 3.1rem;
+}
+
+.teks-contact {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.teks-email {
+    font-size: 1.4rem;
+    font-weight: 500;
+}
+
+.btn-contact {
+    display: flex;
+    justify-content: flex-start;
+    font-size: 1.4rem ;
+    padding: 1rem;
+    margin-top: 1rem;
+    cursor: pointer;
+    background-color: rgba(0, 51, 102, 0.5);
+    border-radius:8px;
+    transition: background .3s;
+}
+.btn-contact:hover {
+    background-color: rgba(9, 116, 223, 0.7);
+    transition: ease-out .3s;
+}
+/* FOOTER END */
+/* penyesuaian tampilan sesuai device agar responsif */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        height: auto;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .logo-container {
+        justify-content: center;
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    .logo-container h1 {
+        font-size: 1.8rem;
+    }
+
+    nav {
+        flex-direction: column;
+        gap: 15px;
+        width: 100%;
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+
+    .beranda {
+        background-size: contain;
+        background-repeat: no-repeat;
+        min-height: 30vh;
+    }
+
+    .teks-beranda {
+        padding: 1rem 0 ;
+    }
+
+    .login-container {
+        justify-content: center;
+        width: 100%;
+        gap: 15px;
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+    }
+
+    .garis-vertical {
+        display: none;
+    }
+
+    .btn-login,
+    .btn-regis {
+        padding: 10px 20px;
+        font-size: 1rem;
+    }
+
+    .logo-container img {
+        width: 60px;
+        height: 45px;
+    }
+
+    .teks-beranda {
+        font-size: 1.2rem;
+    }
+    .btn-jelajahi {
+        font-size: 1rem;
+        width: 10rem;
+        height: 2.5rem;
+    }
+    .skill-home {
+        min-height: 82dvh;
+    }
+    
+    .teks-favorit {
+        font-size: 50px;
+    }
+
+    .teks-favorit {
+        font-size: 2.5rem;
+    }
+
+    .teks-kategori {
+        font-size: 2.5rem;
+    }
+
+    .container {
+        flex-direction: column;
+    }
+    /* footer */
+    footer {
+        flex-direction: column;
+        align-items: center;
+        height: auto;
+        padding: 2rem 1rem;
+        text-align: center;
+    }
+
+    .logo-container-footer {
+        width: 100%;
+        align-items: center;
+    }
+
+    .logo-container-footer a {
+        justify-content: center;
+        margin: 1rem 0;
+    }
+
+    .logo-container-footer p {
+        justify-content: center;
+        margin: 0.5rem 0;
+        font-size: 1.2rem;
+    }
+
+    .logo-medsos {
+        justify-content: center;
+        margin: 1rem 0;
+        gap: 2rem;
+    }
+
+    .deskripsi {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    .about, .contact {
+        width: 100%;
+        margin-top: 1.5rem;
+    }
+
+    .about a,
+    .contact .btn-contact {
+        justify-content: center;
+    }
+
+    .btn-contact {
+        margin-left: 0;
+        justify-content: center;
+    }
+    /* footer-end */
+}
+
+/* Medium screen: tablet ke bawah */
+@media (max-width: 992px) {
+    .logo-container {
+        width: 30%;
+    }
+
+    .logo-container img {
+        width: 65px;
+    }
+
+    .logo-container h1 {
+        font-size: 1.8rem;
+    }
+
+    nav {
+        width: 45%;
+        font-size: 1.3rem;
+    }
+
+    .login-container {
+        width: 25%;
+        font-size: 1.3rem;
+    }
+
+    .icon {
+        max-width: 150px;
+    }
+
+    .teks-beranda {
+        font-size: 1.5rem;
+    }
+    
+}
+
+/* Small screen: smartphone */
+@media (max-width: 600px) {
+    header {
+        flex-direction: column;
+        padding: 15px;
+    }
+
+    .logo-container {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+
+    .logo-container img {
+        width: 50px;
+    }
+
+    .logo-container h1 {
+        font-size: 1.4rem;
+        text-align: center;
+    }
+
+    nav,
+    .login-container {
+        width: 100%;
+        justify-content: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    nav {
+        margin-bottom: 10px;
+    }
+    .icon {
+        max-width: 120px;
+    }
+    .teks-beranda {
+        font-size: 1rem;
+    }
+    /* footer */
+    .logo-container-footer h1 {
+        font-size: 1.6rem;
+    }
+
+    .teks-about,
+    .teks-contact {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.2rem;
+    }
+
+    .about a,
+    .teks-email,
+    .btn-contact {
+        font-size: 1.1rem;
+    }
+
+    .btn-contact {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .logo-medsos svg {
+        width: 1.8rem;
+        height: 1.8rem;
+    }
+    /* footer-end */
+}
+  </style>
+  <!-- style -->
+  <link rel="icon" type="image/png" href="assets/logo.png" />
+  <!-- FONT -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <!-- FONT -->
+  <!-- ICON -->
+  <script src="https://unpkg.com/feather-icons"></script>
+  <!-- ICON -->
+  <!-- CSS -->
+  <!-- <link rel="stylesheet" href="css/style.css" /> -->
+  <!-- CSS -->
+</head>
+
+<body>
+  <!-- HEADER -->
+  <header id="header">
+    <div class="logo-container">
+      <a href="#">
+        <img src="assets/logo.png" width="50px" height="60px" alt="logo" />
+        <h1>Gudang<span>skill</span></h1>
+      </a>
+    </div>
+    <!-- NAVBAR -->
+    <nav>
+      <a href="#">Home</a>
+      <a href="#favorit">Favorit</a>
+      <a href="contact.php">Contact</a>
+    </nav>
+    <!-- NAVBAR END -->
+    <div class="login-container">
+      <?php if (isset($_SESSION['email'])): ?>
+        <span style="margin-right: 10px;">
+          Hi, <?php echo isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : htmlspecialchars($_SESSION['email']); ?>
+        </span>
+        <div class="garis-vertical"></div>
+        <a href="logout.php" class="btn-login">Logout</a>
+      <?php else: ?>
+        <a href="login.php" class="btn-login">Login</a>
+        <div class="garis-vertical"></div>
+        <a href="sign_up.php" class="btn-regis">Sign Up</a>
+      <?php endif; ?>
+    </div>
+  </header>
+  <!--HEADER END -->
+  <!-- CONTENT MAIN -->
+  <main>
+    <!-- BERANDA-->
+    <section class="beranda" id="beranda">
+      <div class="teks-beranda">
+        <h1>
+          Tingkatkan Skillmu dengan <br />
+          Video Tutorial Terbaik!
+        </h1>
+        <button onclick="location.href='#skill-home'" class="btn-jelajahi">
+          Jelajahi Tutorial
+        </button>
+      </div>
+    </section>
+    <!-- BERANDA END-->
+    <!-- SKILL HOME-->
+    <section id="skill-home" class="skill-home">
+      <div class="teks-kategori">Skill Home</div>
+      <div>
+        <div class="container scroll-1">
+          <div class="card">
+            <div class="card__content">
+              <a href="level.php#kategori-1">
+                <img src="assets/kategori1.jpg" alt="" />
+              </a>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card__content">
+              <a href="level.php#kategori-2">
+                <img src="assets/kategori2.jpg" alt="" />
+              </a>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card__content">
+              <a href="level.php#kategori-3">
+                <img src="assets/kategori3.jpg" alt="" />
+              </a>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card__content">
+              <a href="level.php#kategori-4">
+                <img src="assets/kategori4.jpg" alt="" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- SKILL HOME END -->
+    <!-- FAVORIT -->
+    <section id="favorit" class="favorit">
+    <div class="teks-favorit">Favorit</div>
+    <div>
+        <div class="content">
+            <?php if (count($favorit_videos) > 0): ?>
+                <?php foreach ($favorit_videos as $video): ?>
+                    <div class="favorit-content">
+                        <a href="<?= htmlspecialchars($video['video_url']) ?>" target="_blank">
+                            <img src="<?= htmlspecialchars($video['thumbnail']) ?>" alt="Thumbnail" />
+                        </a>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="favorit-content" style="grid-column: span 2; text-align: center;">
+                    Belum ada video favorit disimpan.
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</section>
+    <!-- FAVORIT END -->
+  </main>
+  <!-- CONTENT MAIN END-->
+  <!-- FOOTER -->
+  <footer>
+    <div class="logo-container-footer">
+      <a href="#header">
+        <img src="assets/logo.png" width="50px" height="60px" alt="logo" />
+        <h1>Gudang<span class="teks-skill">skill</span></h1>
+      </a>
+      <p>
+        Copyright <span class="logo-copy"> &copy; </span>all rights reserved
+      </p>
+      <div class="logo-medsos">
+        <a href="https://www.facebook.com/gudangskill.2025?mibextid=ZbWKwL">
+          <i data-feather="facebook"></i>
+        </a>
+        <a href="https://www.instagram.com/gudangskill_?igsh=MWExcGtpM2N4ZW90NQ%3D%3D">
+          <i data-feather="instagram"></i>
+        </a>
+      </div>
+    </div>
+    <div class="deskripsi">
+      <div class="about">
+        <p class="teks-about">About</p>
+        <a href="#">Home</a>
+        <a href="#favorit">Favorit</a>
+      </div>
+      <div class="contact">
+        <p class="teks-contact">Contact Us</p>
+        <p class="teks-email">gudangskill@gmail.com</p>
+        <button onclick="location.href='contact.php'" class="btn-contact">Contact Us</button>
+      </div>
+    </div>
+  </footer>
+
+  <!--FOOTER END  -->
+  <!-- ICON -->
+  <script>
+    feather.replace();
+  </script>
+  <!-- script  -->
+  <script src="js/java.js" />
+</body>
+
+</html>
